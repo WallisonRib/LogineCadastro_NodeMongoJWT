@@ -4,9 +4,12 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { Db } = require("mongodb");
+const cors = require("cors"); // Adicione esta linha
+
 
 const app = express();
 app.use(express.json())
+app.use(cors());
 
 //Exportar models
 
@@ -31,8 +34,6 @@ app.get("/user/:id", checkToken, async (req, res) => {
   res.status(200).json({msg : "Usuario encontrado :", user})
 })
 
-
-
 function checkToken(req, res, next){
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(" ")[1]
@@ -55,7 +56,6 @@ function checkToken(req, res, next){
 app.post('/auth/register', async (req, res) => {
   const { name, email, password, confirmpassword } = req.body;
 
-
   //validations
   if (!name) {
     return res.status(422).json({ msg: "o nome é obrigatório !" })
@@ -77,7 +77,7 @@ app.post('/auth/register', async (req, res) => {
   const userExist = await User.findOne({ email: email })
 
   if (userExist) {
-    return res.status(422).json({ msg: "e-mail ja cadastrado" })
+    return res.status(422).json({ error:"Email ja cadastrado", msg: "e-mail ja cadastrado" })    
   }
 
   //Criando a senha
@@ -155,3 +155,4 @@ mongoose
     console.log("Conectado ao MongoDB");
   })
   .catch((err) => console.log(err));
+
